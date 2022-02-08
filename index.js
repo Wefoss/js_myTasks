@@ -67,7 +67,7 @@ class ConcurencyQueue {
       return this.queueCurrent.push(value)
     });
   }
-
+   
    deQueue() {
     return  Promise.resolve(() => {
       return this.queueCurrent.shift();
@@ -75,9 +75,10 @@ class ConcurencyQueue {
   }
 
   async queuing(req) {
-       for (let i = 0; i < this.concurency; i++) {
-     await req.then(data => data())
-   }
+       while (this.concurency) {
+        await req.then(data => data())
+        this.concurency--
+       }
   }
 }
 
@@ -85,7 +86,7 @@ const concQueue = new ConcurencyQueue(3);
 
 const req1 = concQueue.queue(5);
 const req2 = concQueue.deQueue();
-concQueue.queuing(req2);
+concQueue.queuing(req1);
 console.log(concQueue);
 
 
